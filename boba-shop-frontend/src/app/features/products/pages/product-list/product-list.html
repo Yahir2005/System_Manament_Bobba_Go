@@ -1,1 +1,45 @@
-<p>product-list works!</p>
+<div class="container my-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="h3 mb-0">Catálogo General de Productos</h2>
+      <p class="text-muted small mb-0">Control de estados de inventario</p>
+    </div>
+    <a routerLink="/products/new" class="btn btn-primary">
+      <i class="bi bi-plus-lg me-1"></i>Nuevo Producto
+    </a>
+  </div>
+
+  <div *ngIf="isLoading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status"></div>
+  </div>
+
+  <div *ngIf="!isLoading" class="table-responsive shadow-sm rounded">
+    <table class="table table-hover align-middle mb-0 bg-white">
+      <thead class="table-light">
+        <tr>
+          <th>Producto</th>
+          <th>Precio</th>
+          <th>Estado</th>
+          <th>Registrado</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let p of products">
+          <td class="fw-semibold">{{ p.name }}</td>
+          <td>${{ p.price | number:'1.2-2' }}</td>
+          <td>
+            <span class="badge" 
+              [ngClass]="{
+                'bg-success': p.status === 'approved',
+                'bg-warning text-dark': p.status === 'pending',
+                'bg-danger': p.status === 'rejected'
+              }">
+              {{ p.status }}
+            </span>
+          </td>
+          <td class="small text-muted">{{ p.created_at | date:'shortDate' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
