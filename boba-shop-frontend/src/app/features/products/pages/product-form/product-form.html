@@ -1,1 +1,111 @@
-<p>product-form works!</p>
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-12 col-md-8 col-lg-6">
+      
+      <div class="card shadow-sm border-0">
+        <div class="card-header bg-primary text-white py-3">
+          <h4 class="card-title mb-0 fs-5">
+            <i class="bi bi-plus-circle me-2"></i>Registrar Producto
+          </h4>
+        </div>
+
+        <div class="card-body p-4">
+          <div class="alert alert-warning d-flex align-items-center mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle-fill flex-shrink-0 me-2 fs-5"></i>
+            <small>
+              El producto quedará en estado <strong>Pendiente</strong> y requerirá la autorización del administrador antes de mostrarse en el menú público.
+            </small>
+          </div>
+
+          <form [formGroup]="productForm" (ngSubmit)="onSubmit()">
+            
+            <div class="mb-3">
+              <label for="id_category" class="form-label fw-semibold">Categoría</label>
+              <select 
+                id="id_category" 
+                class="form-select" 
+                formControlName="id_category"
+                [class.is-invalid]="productForm.get('id_category')?.touched && productForm.get('id_category')?.invalid">
+                <option value="" disabled>Selecciona una categoría</option>
+                <option *ngFor="let cat of categories" [value]="cat.id_category">
+                  {{ cat.name }} ({{ cat.type?.name || 'General' }})
+                </option>
+              </select>
+              <div class="invalid-feedback">
+                La categoría es obligatoria.
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="name" class="form-label fw-semibold">Nombre del Producto</label>
+              <input 
+                id="name" 
+                type="text" 
+                class="form-control" 
+                formControlName="name" 
+                placeholder="Ej. Bobba Taro Clásica"
+                [class.is-invalid]="productForm.get('name')?.touched && productForm.get('name')?.invalid">
+              <div class="invalid-feedback">
+                El nombre es obligatorio (máx. 120 caracteres).
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="precio" class="form-label fw-semibold">Precio</label>
+              <div class="input-group">
+                <span class="input-group-text">$</span>
+                <input 
+                  id="precio" 
+                  type="number" 
+                  step="0.50" 
+                  class="form-control" 
+                  formControlName="precio" 
+                  placeholder="0.00"
+                  [class.is-invalid]="productForm.get('precio')?.touched && productForm.get('precio')?.invalid">
+                <div class="invalid-feedback">
+                  Ingresa un precio válido mayor a 0.
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="image_url" class="form-label fw-semibold">URL de la Imagen</label>
+              <input 
+                id="image_url" 
+                type="url" 
+                class="form-control" 
+                formControlName="image_url" 
+                placeholder="https://ejemplo.com/imagen.jpg">
+            </div>
+
+            <div class="mb-4">
+              <label for="description" class="form-label fw-semibold">Descripción</label>
+              <textarea 
+                id="description" 
+                rows="3" 
+                class="form-control" 
+                formControlName="description" 
+                placeholder="Notas de sabor, ingredientes, especificaciones..."></textarea>
+            </div>
+
+            <div *ngIf="errorMessage" class="alert alert-danger mb-3" role="alert">
+              <i class="bi bi-x-circle-fill me-2"></i>{{ errorMessage }}
+            </div>
+
+            <div class="d-grid gap-2">
+              <button 
+                type="submit" 
+                class="btn btn-primary btn-lg" 
+                [disabled]="productForm.invalid || isSubmitting">
+                <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2" role="status"></span>
+                {{ isSubmitting ? 'Guardando...' : 'Enviar para Aprobación' }}
+              </button>
+            </div>
+
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
