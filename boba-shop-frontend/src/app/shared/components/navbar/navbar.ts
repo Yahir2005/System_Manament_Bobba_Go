@@ -6,13 +6,12 @@ import { User } from '../../../features/auth/models/auth.model';
 
 @Component({
   selector: 'app-navbar',
-  standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './navbar.html',
-  styleUrls: ['./navbar.scss']
+  styleUrl: './navbar.scss'
 })
-export class NavbarComponent {
-  private authService = inject(AuthService);
+export class Navbar {
+  public authService = inject(AuthService);
   private router = inject(Router);
 
   get currentUser(): User | null {
@@ -24,3 +23,5 @@ export class NavbarComponent {
     this.router.navigate(['/auth/login']);
   }
 }
+
+export { Navbar as NavbarComponent };

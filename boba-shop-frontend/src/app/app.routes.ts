@@ -22,6 +22,11 @@ export const routes: Routes = [
       import('./features/products/products.routes').then((m) => m.PRODUCTS_ROUTES)
   },
   {
+    path: 'categories',
+    loadChildren: () =>
+      import('./features/categories/categories.routes').then((m) => m.CATEGORIES_ROUTES)
+  },
+  {
     path: 'loyalty',
     loadChildren: () =>
       import('./features/loyalty/loyalty.routes').then((m) => m.LOYALTY_ROUTES)

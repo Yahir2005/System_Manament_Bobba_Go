@@ -16,25 +16,25 @@
               name="qrInput" 
               placeholder="Ingresa token o lee con escáner físico/cámara"
               required autofocus>
-            <button class="btn btn-primary" type="submit" [disabled]="isProcessing">
-              <span *ngIf="isProcessing" class="spinner-border spinner-border-sm me-1"></span>
+            <button class="btn btn-primary" type="submit" [disabled]="isProcessing()">
+              <span *ngIf="isProcessing()" class="spinner-border spinner-border-sm me-1"></span>
               Registrar Sello
             </button>
           </div>
         </form>
 
         <!-- Mensaje de Rechazo (Regla de 12 horas) -->
-        <div *ngIf="errorMessage" class="alert alert-danger" role="alert">
-          <i class="bi bi-clock-history me-2"></i>{{ errorMessage }}
+        <div *ngIf="errorMessage()" class="alert alert-danger" role="alert">
+          <i class="bi bi-clock-history me-2"></i>{{ errorMessage() }}
         </div>
 
         <!-- Mensaje de Éxito -->
-        <div *ngIf="scanResult" class="alert alert-success" role="alert">
+        <div *ngIf="scanResult() as result" class="alert alert-success" role="alert">
           <h5 class="alert-heading h6 fw-bold mb-1">¡Sello Registrado!</h5>
-          <p class="mb-1">{{ scanResult.message }}</p>
+          <p class="mb-1">{{ result.message }}</p>
           <hr>
-          <p class="mb-0 small">Sellos actuales: <strong>{{ scanResult.stamps_count }}/10</strong></p>
-          <span *ngIf="scanResult.eligible_for_reward" class="badge bg-warning text-dark mt-2">
+          <p class="mb-0 small">Sellos actuales: <strong>{{ result.stamps_count }}/10</strong></p>
+          <span *ngIf="result.eligible_for_reward" class="badge bg-warning text-dark mt-2">
             ¡Completó 10 sellos! Recompensa disponible.
           </span>
         </div>

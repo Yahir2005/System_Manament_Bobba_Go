@@ -1,54 +1,119 @@
-<div class="container my-5 py-4">
-  <div class="row justify-content-center">
-    <div class="col-12 col-sm-9 col-md-6 col-lg-4">
-      <div class="card shadow-sm border-0 rounded-4">
-        <div class="card-body p-4 p-md-5">
-          <div class="text-center mb-4">
-            <i class="bi bi-person-circle fs-1 text-primary"></i>
-            <h2 class="h4 fw-bold mt-2">Iniciar Sesión</h2>
+<div class="login-wrapper d-flex align-items-center justify-content-center min-vh-100 py-5">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-12 col-sm-10 col-md-8 col-lg-5 col-xl-4">
+        
+        <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
+          
+          <!-- Encabezado con branding de Bobba Go -->
+          <div class="card-header bg-primary text-white text-center py-4 border-0">
+            <div class="brand-icon mb-2">
+              <i class="bi bi-cup-straw display-4"></i>
+            </div>
+            <h3 class="fw-bold mb-1">Bobba Go!</h3>
+            <p class="small text-white-50 mb-0">Sistema de Gestión y Catálogo</p>
           </div>
 
-          <div *ngIf="errorMessage" class="alert alert-danger py-2 small" role="alert">
-            <i class="bi bi-exclamation-triangle-fill me-1"></i>{{ errorMessage }}
-          </div>
+          <div class="card-body p-4 p-md-5">
+            <h4 class="h5 fw-bold text-center mb-4 text-dark">Iniciar Sesión</h4>
 
-          <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-            <div class="mb-3">
-              <label for="email" class="form-label fw-semibold small">Usuario / Correo</label>
-              <div class="input-group">
-                <span class="input-group-text bg-light"><i class="bi bi-envelope"></i></span>
-                <input 
-                  type="email" 
-                  id="email" 
-                  class="form-control" 
-                  formControlName="email" 
-                  placeholder="usuario@boba.com"
-                  [class.is-invalid]="loginForm.get('email')?.touched && loginForm.get('email')?.invalid">
+            <!-- Mensaje de error -->
+            <div *ngIf="mensajeError()" class="alert alert-danger d-flex align-items-center mb-4 py-2" role="alert">
+              <i class="bi bi-exclamation-circle-fill me-2 fs-5 flex-shrink-0"></i>
+              <div class="small">{{ mensajeError() }}</div>
+            </div>
+
+            <form (ngSubmit)="onLogin()">
+              
+              <!-- Correo electrónico -->
+              <div class="mb-3">
+                <label for="email" class="form-label fw-semibold small text-muted">Correo Electrónico</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light border-end-0">
+                    <i class="bi bi-envelope text-muted"></i>
+                  </span>
+                  <input
+                    id="email"
+                    type="email"
+                    name="email"
+                    [(ngModel)]="credenciales.email"
+                    class="form-control border-start-0 ps-0"
+                    placeholder="ejemplo@bobago.com"
+                    required
+                    autocomplete="email"
+                  />
+                </div>
+              </div>
+
+              <!-- Contraseña -->
+              <div class="mb-4">
+                <label for="password" class="form-label fw-semibold small text-muted">Contraseña</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light border-end-0">
+                    <i class="bi bi-lock text-muted"></i>
+                  </span>
+                  <input
+                    id="password"
+                    [type]="mostrarPassword() ? 'text' : 'password'"
+                    name="password"
+                    [(ngModel)]="credenciales.password"
+                    class="form-control border-start-0 border-end-0 ps-0"
+                    placeholder="••••••••"
+                    required
+                    autocomplete="current-password"
+                  />
+                  <button
+                    type="button"
+                    class="btn btn-outline-secondary border-start-0 bg-light"
+                    (click)="togglePassword()"
+                    [title]="mostrarPassword() ? 'Ocultar contraseña' : 'Ver contraseña'"
+                  >
+                    <i class="bi" [ngClass]="mostrarPassword() ? 'bi-eye-slash' : 'bi-eye'"></i>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Botón de ingresar -->
+              <div class="d-grid gap-2 mb-3">
+                <button
+                  type="submit"
+                  class="btn btn-primary btn-lg fw-semibold"
+                  [disabled]="isSubmitting()"
+                >
+                  <span *ngIf="isSubmitting()" class="spinner-border spinner-border-sm me-2" role="status"></span>
+                  {{ isSubmitting() ? 'Ingresando...' : 'Entrar al Sistema' }}
+                </button>
+              </div>
+
+              <!-- Enlace a Menú Público -->
+              <div class="text-center pt-2">
+                <a routerLink="/menu" class="text-decoration-none small text-muted">
+                  <i class="bi bi-arrow-left me-1"></i>Regresar al Menú Público
+                </a>
+              </div>
+
+            </form>
+
+            <!-- Credenciales de prueba / ayuda para el usuario -->
+            <div class="mt-4 pt-3 border-top text-center text-muted small">
+              <span class="badge bg-light text-secondary border mb-1">Cuentas disponibles</span>
+              <div class="d-flex justify-content-around mt-2">
+                <div>
+                  <span class="d-block fw-bold text-dark">Admin</span>
+                  <code>admin@bobago.com</code><br>
+                  <small>admin123</small>
+                </div>
+                <div>
+                  <span class="d-block fw-bold text-dark">Empleado</span>
+                  <code>empleado@bobago.com</code><br>
+                  <small>empleado123</small>
+                </div>
               </div>
             </div>
 
-            <div class="mb-4">
-              <label for="password_hash" class="form-label fw-semibold small">Contraseña</label>
-              <div class="input-group">
-                <span class="input-group-text bg-light"><i class="bi bi-lock"></i></span>
-                <input 
-                  type="password" 
-                  id="password_hash" 
-                  class="form-control" 
-                  formControlName="password_hash" 
-                  placeholder="••••••••"
-                  [class.is-invalid]="loginForm.get('password_hash')?.touched && loginForm.get('password_hash')?.invalid">
-              </div>
-            </div>
-
-            <div class="d-grid">
-              <button type="submit" class="btn btn-primary py-2 fw-semibold" [disabled]="loginForm.invalid || isLoading">
-                <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
-                {{ isLoading ? 'Validando...' : 'Entrar' }}
-              </button>
-            </div>
-          </form>
+          </div>
         </div>
+
       </div>
     </div>
   </div>

@@ -1,6 +1,6 @@
 export interface Role {
-  id_role: number;
-  name: 'administrator' | 'employee';
+  id_role?: number;
+  name?: 'administrator' | 'employee' | string;
 }
 
 export interface User {
@@ -15,10 +15,12 @@ export interface User {
 
 export interface LoginCredentials {
   email: string;
-  password_hash: string;
+  password?: string;
+  password_hash?: string;
 }
 
 export interface AuthResponse {
+  message?: string;
   token: string;
   user: User;
 }

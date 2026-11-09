@@ -35,6 +35,11 @@ export class ProductService {
     return this.http.get<Product[]>(`${this.apiUrl}/products/pending`);
   }
 
+  // Obtener producto individual por ID
+  getProductById(id_product: number): Observable<Product> {
+    return this.http.get<Product>(`${this.apiUrl}/products/${id_product}`);
+  }
+
   // Registrar nuevo producto (por defecto el backend lo guarda en 'pending')
   createProduct(product: CreateProductDto): Observable<Product> {
     return this.http.post<Product>(`${this.apiUrl}/products`, product);
@@ -43,6 +48,15 @@ export class ProductService {
   // Cambiar estatus de un producto (solo administrador: 'approved' | 'rejected')
   reviewProduct(id_product: number, review: ReviewProductDto): Observable<Product> {
     return this.http.patch<Product>(`${this.apiUrl}/products/${id_product}/status`, review);
+  }
+
+  createProductWithFormData(formData: FormData): Observable<Product> {
+    return this.http.post<Product>(`${this.apiUrl}/products`, formData);
+  }
+
+  // Actualizar producto existente (enviando FormData para admitir imagen y pasando a estado 'pending')
+  updateProductWithFormData(id_product: number, formData: FormData): Observable<Product> {
+    return this.http.put<Product>(`${this.apiUrl}/products/${id_product}`, formData);
   }
 }
 

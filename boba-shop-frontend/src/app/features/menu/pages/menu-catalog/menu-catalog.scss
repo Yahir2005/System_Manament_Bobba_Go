@@ -1,0 +1,51 @@
+.category-card-btn {
+  background-color: #ffffff;
+  border: 2px solid #e9ecef;
+  transition: all 0.25s ease-in-out;
+  cursor: pointer;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1) !important;
+    border-color: #0d6efd;
+  }
+
+  &.active-category {
+    border-color: #0d6efd;
+    background-color: #f0f7ff;
+    box-shadow: 0 0.25rem 0.75rem rgba(13, 110, 253, 0.15) !important;
+  }
+}
+
+.category-accordion-header {
+  transition: all 0.2s ease-in-out;
+  border-width: 1px;
+
+  &:hover {
+    background-color: #f8f9fa;
+  }
+
+  &.expanded {
+    border-color: #b6d4fe;
+    background-color: #f0f7ff;
+  }
+}
+
+.product-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.12) !important;
+  }
+}
+
+.edit-floating-btn {
+  opacity: 0.9;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+
+  &:hover {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}

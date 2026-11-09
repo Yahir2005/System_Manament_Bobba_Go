@@ -1,45 +1,101 @@
 <div class="container my-5">
-  <div class="d-flex justify-content-between align-items-center mb-4">
+  <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
     <div>
-      <h2 class="h3 mb-0">Catálogo General de Productos</h2>
-      <p class="text-muted small mb-0">Control de estados de inventario</p>
+      <h2 class="h3 fw-bold mb-1">Inventario de Productos</h2>
+      <p class="text-muted mb-0">Listado general de bebidas y alimentos registrados en Bobba Go.</p>
     </div>
-    <a routerLink="/products/new" class="btn btn-primary">
-      <i class="bi bi-plus-lg me-1"></i>Nuevo Producto
-    </a>
+    <div class="d-flex gap-2">
+      <a routerLink="/products/new" class="btn btn-primary">
+        <i class="bi bi-plus-lg me-1"></i>Nuevo Producto
+      </a>
+      <a *ngIf="authService.isAdmin()" routerLink="/categories/new" class="btn btn-outline-info">
+        <i class="bi bi-tags me-1"></i>Nueva Categoría
+      </a>
+      <a *ngIf="authService.isAdmin()" routerLink="/products/approvals" class="btn btn-outline-warning">
+        <i class="bi bi-shield-check me-1"></i>Bandeja de Aprobaciones
+      </a>
+    </div>
   </div>
 
-  <div *ngIf="isLoading" class="text-center py-5">
-    <div class="spinner-border text-primary" role="status"></div>
+  <!-- Spinner de carga -->
+  <div *ngIf="isLoading()" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Cargando productos...</span>
+    </div>
   </div>
 
-  <div *ngIf="!isLoading" class="table-responsive shadow-sm rounded">
-    <table class="table table-hover align-middle mb-0 bg-white">
-      <thead class="table-light">
-        <tr>
-          <th>Producto</th>
-          <th>Precio</th>
-          <th>Estado</th>
-          <th>Registrado</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let p of products">
-          <td class="fw-semibold">{{ p.name }}</td>
-          <td>${{ p.price | number:'1.2-2' }}</td>
-          <td>
-            <span class="badge" 
-              [ngClass]="{
-                'bg-success': p.status === 'approved',
-                'bg-warning text-dark': p.status === 'pending',
-                'bg-danger': p.status === 'rejected'
-              }">
-              {{ p.status }}
-            </span>
-          </td>
-          <td class="small text-muted">{{ p.created_at | date:'shortDate' }}</td>
-        </tr>
-      </tbody>
-    </table>
+  <!-- Tabla de productos -->
+  <div *ngIf="!isLoading() && products().length > 0" class="card shadow-sm border-0 rounded-3 overflow-hidden">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Producto</th>
+            <th>Categoría</th>
+            <th>Precio</th>
+            <th>Estado</th>
+            <th>Fecha Registro</th>
+            <th class="text-end">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let p of products()">
+            <td>
+              <div class="d-flex align-items-center">
+                <img
+                  [src]="p.image_url || 'https://via.placeholder.com/50?text=Boba'"
+                  [alt]="p.name"
+                  class="rounded-3 me-3 object-fit-cover shadow-sm"
+                  style="width: 48px; height: 48px;"
+                />
+                <div>
+                  <span class="fw-bold d-block text-dark">{{ p.name }}</span>
+                  <small class="text-muted text-truncate d-inline-block" style="max-width: 300px;">
+                    {{ p.description || 'Sin descripción' }}
+                  </small>
+                </div>
+              </div>
+            </td>
+            <td>
+              <span class="badge bg-light text-dark border">{{ p.category?.name || 'Categoría' }}</span>
+            </td>
+            <td class="fw-bold text-primary">${{ p.price | number:'1.2-2' }}</td>
+            <td>
+              <span
+                class="badge"
+                [ngClass]="{
+                  'bg-success': p.status === 'approved',
+                  'bg-warning text-dark': p.status === 'pending',
+                  'bg-danger': p.status === 'rejected'
+                }"
+              >
+                {{ p.status === 'approved' ? 'Aprobado' : p.status === 'pending' ? 'Pendiente' : 'Rechazado' }}
+              </span>
+            </td>
+            <td class="small text-muted">{{ p.created_at | date:'short' }}</td>
+            <td class="text-end">
+              <a 
+                [routerLink]="['/products/edit', p.id_product]" 
+                class="btn btn-outline-primary btn-sm"
+                title="Editar producto (requerirá aprobación)">
+                <i class="bi bi-pencil-fill me-1"></i>Editar
+              </a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Estado vacío -->
+  <div *ngIf="!isLoading() && products().length === 0" class="card text-center p-5 border-dashed">
+    <div class="card-body">
+      <i class="bi bi-inbox text-muted display-4 mb-3"></i>
+      <h5>No hay productos registrados</h5>
+      <p class="text-muted">Empieza agregando tu primer producto al sistema.</p>
+      <a routerLink="/products/new" class="btn btn-primary mt-2">
+        <i class="bi bi-plus-lg me-1"></i>Crear Producto
+      </a>
+    </div>
   </div>
 </div>

@@ -8,27 +8,27 @@
         <!-- Simulación de visualizador QR -->
         <div class="bg-white p-3 rounded-3 shadow-sm d-inline-block mx-auto mb-3">
           <img 
-            [src]="'https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=' + (customer?.qr_code || 'DEMO_CODE')" 
+            [src]="'https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=' + (customer()?.qr_code || 'DEMO_CODE')" 
             alt="QR Lealtad" 
             class="img-fluid rounded">
         </div>
-        <p class="fw-bold text-dark mb-3">{{ customer?.name || 'Cliente Bobba' }}</p>
+        <p class="fw-bold text-dark mb-3">{{ customer()?.name || 'Cliente Bobba' }}</p>
 
         <!-- Cuadrícula de 10 Sellos -->
         <div class="card bg-white p-3 border-0 rounded-3 shadow-sm mb-3">
-          <h6 class="text-secondary small fw-bold mb-3">TUS SELLOS ({{ customer?.stamps_count || 0 }}/10)</h6>
+          <h6 class="text-secondary small fw-bold mb-3">TUS SELLOS ({{ customer()?.stamps_count || 0 }}/10)</h6>
           <div class="d-flex flex-wrap justify-content-center gap-2">
             <div *ngFor="let slot of slots" 
                  class="d-flex align-items-center justify-content-center rounded-circle border"
                  style="width: 44px; height: 44px;"
-                 [ngClass]="(customer?.stamps_count || 0) >= slot ? 'bg-primary text-white border-primary' : 'bg-light text-muted'">
-              <i *ngIf="(customer?.stamps_count || 0) >= slot" class="bi bi-check2 fs-5"></i>
-              <span *ngIf="(customer?.stamps_count || 0) < slot" class="small">{{ slot }}</span>
+                 [ngClass]="(customer()?.stamps_count || 0) >= slot ? 'bg-primary text-white border-primary' : 'bg-light text-muted'">
+              <i *ngIf="(customer()?.stamps_count || 0) >= slot" class="bi bi-check2 fs-5"></i>
+              <span *ngIf="(customer()?.stamps_count || 0) < slot" class="small">{{ slot }}</span>
             </div>
           </div>
         </div>
 
-        <div *ngIf="(customer?.stamps_count || 0) >= 10" class="alert alert-success py-2 mb-0">
+        <div *ngIf="(customer()?.stamps_count || 0) >= 10" class="alert alert-success py-2 mb-0">
           <i class="bi bi-gift-fill me-1"></i> ¡Tienes una bebida o pastel gratis listo para canjear!
         </div>
       </div>

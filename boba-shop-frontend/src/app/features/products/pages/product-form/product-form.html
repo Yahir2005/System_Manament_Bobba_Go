@@ -3,19 +3,32 @@
     <div class="col-12 col-md-8 col-lg-6">
       
       <div class="card shadow-sm border-0">
-        <div class="card-header bg-primary text-white py-3">
+        <div class="card-header bg-primary text-white py-3 d-flex justify-content-between align-items-center">
           <h4 class="card-title mb-0 fs-5">
-            <i class="bi bi-plus-circle me-2"></i>Registrar Producto
+            <i class="bi" [ngClass]="isEditMode() ? 'bi-pencil-square me-2' : 'bi-plus-circle me-2'"></i>
+            {{ isEditMode() ? 'Editar Producto' : 'Registrar Producto' }}
           </h4>
+          <span *ngIf="isEditMode()" class="badge bg-light text-dark">ID: #{{ productId() }}</span>
         </div>
 
         <div class="card-body p-4">
-          <div class="alert alert-warning d-flex align-items-center mb-4" role="alert">
-            <i class="bi bi-exclamation-triangle-fill flex-shrink-0 me-2 fs-5"></i>
-            <small>
-              El producto quedará en estado <strong>Pendiente</strong> y requerirá la autorización del administrador antes de mostrarse en el menú público.
-            </small>
+          <!-- Spinner si está cargando el producto -->
+          <div *ngIf="isLoadingProduct()" class="text-center py-4">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="small text-muted mt-2 mb-0">Cargando información del producto...</p>
           </div>
+
+          <div *ngIf="!isLoadingProduct()">
+            <!-- Aviso informativo -->
+            <div class="alert alert-warning d-flex align-items-center mb-4" role="alert">
+              <i class="bi bi-exclamation-triangle-fill flex-shrink-0 me-2 fs-5"></i>
+              <small *ngIf="isEditMode()">
+                <strong>Atención:</strong> Al editar este producto, los cambios pasarán a estado <strong>Pendiente</strong> y <strong>no se presentarán en la página que ve el cliente</strong> hasta que el Administrador autorice el cambio.
+              </small>
+              <small *ngIf="!isEditMode()">
+                El producto quedará en estado <strong>Pendiente</strong> y requerirá la autorización del administrador antes de mostrarse en el menú público.
+              </small>
+            </div>
 
           <form [formGroup]="productForm" (ngSubmit)="onSubmit()">
             
@@ -27,7 +40,7 @@
                 formControlName="id_category"
                 [class.is-invalid]="productForm.get('id_category')?.touched && productForm.get('id_category')?.invalid">
                 <option value="" disabled>Selecciona una categoría</option>
-                <option *ngFor="let cat of categories" [value]="cat.id_category">
+                <option *ngFor="let cat of categories()" [value]="cat.id_category">
                   {{ cat.name }} ({{ cat.type?.name || 'General' }})
                 </option>
               </select>
@@ -69,13 +82,41 @@
             </div>
 
             <div class="mb-3">
-              <label for="image_url" class="form-label fw-semibold">URL de la Imagen</label>
-              <input 
-                id="image_url" 
-                type="url" 
-                class="form-control" 
-                formControlName="image_url" 
-                placeholder="https://ejemplo.com/imagen.jpg">
+            <label class="form-label fw-semibold">Fotografía del Producto</label>
+  
+            <!-- Zona Drag & Drop -->
+              <div 
+                class="border border-2 border-dashed rounded-3 p-4 text-center cursor-pointer bg-light position-relative"
+                [class.border-primary]="isDragging()"
+                (dragover)="onDragOver($event)"
+                (dragleave)="onDragLeave($event)"
+                (drop)="onDrop($event)"
+                (click)="fileInput.click()">
+                
+                <!-- Input oculto para que también funcione haciendo clic normal -->
+                <input 
+                  type="file" 
+                  #fileInput 
+                  class="d-none" 
+                  accept="image/png, image/jpeg, image/webp"
+                  (change)="onFileSelected($event)">
+
+                <!-- Estado 1: No hay imagen seleccionada -->
+                <div *ngIf="!previewUrl()">
+                  <i class="bi bi-cloud-arrow-up display-5 text-secondary"></i>
+                  <p class="mb-1 mt-2 fw-medium text-dark">Arrastra tu imagen aquí o haz clic para buscar</p>
+                  <small class="text-muted d-block">Soporta PNG, JPG o WEBP (máximo 5 MB)</small>
+                </div>
+
+                <!-- Estado 2: Vista previa si ya seleccionó imagen -->
+                <div *ngIf="previewUrl()" class="d-flex flex-column align-items-center">
+                  <img [src]="previewUrl()" alt="Vista previa" class="img-thumbnail rounded mb-2" style="max-height: 180px;">
+                  <button type="button" class="btn btn-outline-danger btn-sm" (click)="removeImage($event)">
+                    <i class="bi bi-trash me-1"></i>Cambiar imagen
+                  </button>
+                </div>
+
+              </div>
             </div>
 
             <div class="mb-4">
@@ -88,21 +129,26 @@
                 placeholder="Notas de sabor, ingredientes, especificaciones..."></textarea>
             </div>
 
-            <div *ngIf="errorMessage" class="alert alert-danger mb-3" role="alert">
-              <i class="bi bi-x-circle-fill me-2"></i>{{ errorMessage }}
+            <div *ngIf="errorMessage()" class="alert alert-danger mb-3" role="alert">
+              <i class="bi bi-x-circle-fill me-2"></i>{{ errorMessage() }}
             </div>
 
             <div class="d-grid gap-2">
               <button 
                 type="submit" 
                 class="btn btn-primary btn-lg" 
-                [disabled]="productForm.invalid || isSubmitting">
-                <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2" role="status"></span>
-                {{ isSubmitting ? 'Guardando...' : 'Enviar para Aprobación' }}
+                [disabled]="productForm.invalid || isSubmitting()">
+                <span *ngIf="isSubmitting()" class="spinner-border spinner-border-sm me-2" role="status"></span>
+                <i *ngIf="!isSubmitting()" class="bi" [ngClass]="isEditMode() ? 'bi-check2-circle me-1' : 'bi-send me-1'"></i>
+                {{ isSubmitting() ? 'Guardando...' : (isEditMode() ? 'Guardar Cambios y Enviar para Autorización' : 'Enviar para Aprobación') }}
               </button>
+              <a routerLink="/menu" class="btn btn-outline-secondary">
+                <i class="bi bi-x me-1"></i>Cancelar
+              </a>
             </div>
 
           </form>
+          </div>
         </div>
       </div>
 

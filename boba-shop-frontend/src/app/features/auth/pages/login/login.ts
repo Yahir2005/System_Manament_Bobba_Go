@@ -1,51 +1,59 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../service/service-auth';
 
+/**
+ * ============================================================================
+ * COMPONENTE: LOGIN (login.ts) - Basado en Inventario_Travelnet
+ * ============================================================================
+ * Pantalla de inicio de sesión para empleados y administradores de Bobba Go.
+ * Permite alternar la visibilidad de la contraseña y redirige a la vista privada.
+ */
 @Component({
   selector: 'app-login',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './login.html',
-  styleUrls: ['./login.scss']
+  styleUrl: './login.scss'
 })
 export class Login {
-  private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
-  loginForm: FormGroup = this.fb.group({
-    email: ['', [Validators.required, Validators.email]],
-    password_hash: ['', [Validators.required, Validators.minLength(4)]]
-  });
+  credenciales = {
+    email: '',
+    password: ''
+  };
 
-  errorMessage = '';
-  isLoading = false;
+  // Signals: necesarios en modo zoneless para reflejar la respuesta HTTP en la vista
+  mensajeError = signal('');
+  isSubmitting = signal(false);
+  mostrarPassword = signal(false);
 
-  onSubmit(): void {
-    if (this.loginForm.invalid) {
-      this.loginForm.markAllAsTouched();
+  togglePassword(): void {
+    this.mostrarPassword.update((v) => !v);
+  }
+
+  onLogin(): void {
+    if (!this.credenciales.email || !this.credenciales.password) {
+      this.mensajeError.set('Por favor ingresa tu correo y contraseña.');
       return;
     }
 
-    this.isLoading = true;
-    this.errorMessage = '';
+    this.isSubmitting.set(true);
+    this.mensajeError.set('');
 
-    this.authService.login(this.loginForm.value).subscribe({
-      next: (res) => {
-        this.isLoading = false;
-        // Redirige según el rol (admin -> aprobaciones / empleado -> productos)
-        if (res.user.role?.name === 'administrator') {
-          this.router.navigate(['/products/approvals']);
-        } else {
-          this.router.navigate(['/products']);
-        }
+    this.authService.login(this.credenciales).subscribe({
+      next: () => {
+        this.isSubmitting.set(false);
+        const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/products';
+        this.router.navigateByUrl(returnUrl);
       },
       error: (err) => {
-        this.isLoading = false;
-        this.errorMessage = err.error?.message || 'Credenciales inválidas.';
+        this.isSubmitting.set(false);
+        this.mensajeError.set(err.error?.error || err.error?.message || 'Credenciales incorrectas. Intenta de nuevo.');
       }
     });
   }

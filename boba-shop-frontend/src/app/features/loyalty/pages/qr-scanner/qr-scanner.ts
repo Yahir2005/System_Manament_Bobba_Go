@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LoyaltyService } from '../../service/service-loyalty';
@@ -14,28 +14,35 @@ import { ScanQrResponse } from '../../models/loyalty.model';
 export class QrScanner {
   private loyaltyService = inject(LoyaltyService);
 
-  qrInput = '';
-  isProcessing = false;
-  scanResult: ScanQrResponse | null = null;
-  errorMessage = '';
+  // Signals: necesarios en modo zoneless para reflejar la respuesta HTTP en la vista
+  qrInput = signal('');
+  isProcessing = signal(false);
+  scanResult = signal<ScanQrResponse | null>(null);
+  errorMessage = signal('');
 
   onScanSubmit(): void {
-    if (!this.qrInput.trim()) return;
+    const code = this.qrInput().trim();
+    if (!code) return;
 
-    this.isProcessing = true;
-    this.errorMessage = '';
-    this.scanResult = null;
+    this.isProcessing.set(true);
+    this.errorMessage.set('');
+    this.scanResult.set(null);
 
-    this.loyaltyService.scanQr({ qr_code: this.qrInput.trim() }).subscribe({
+    this.loyaltyService.scanQr({ qr_code: code }).subscribe({
       next: (res) => {
-        this.scanResult = res;
-        this.isProcessing = false;
-        this.qrInput = '';
+        this.isProcessing.set(false);
+        this.qrInput.set('');
+        // El backend responde 200 con success=false cuando no han pasado 12 horas
+        if (res.success) {
+          this.scanResult.set(res);
+        } else {
+          this.errorMessage.set(res.message);
+        }
       },
       error: (err) => {
         // Maneja el error cuando no han pasado 12 horas
-        this.errorMessage = err.error?.message || 'Error al validar el código QR.';
-        this.isProcessing = false;
+        this.errorMessage.set(err.error?.message || 'Error al validar el código QR.');
+        this.isProcessing.set(false);
       }
     });
   }

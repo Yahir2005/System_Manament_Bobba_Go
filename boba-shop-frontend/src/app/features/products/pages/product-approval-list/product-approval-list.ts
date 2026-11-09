@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ProductService } from '../../service/service-products';
 import { Product } from '../../models/product.model';
@@ -12,25 +12,26 @@ import { Product } from '../../models/product.model';
 export class ProductApprovalList implements OnInit {
   private productService = inject(ProductService);
 
-  pendingProducts: Product[] = [];
-  isLoading = true;
-  feedbackMessage = '';
-  feedbackType: 'success' | 'danger' = 'success';
+  // Signals: necesarios en modo zoneless para que la vista se actualice tras la respuesta HTTP
+  pendingProducts = signal<Product[]>([]);
+  isLoading = signal(true);
+  feedbackMessage = signal('');
+  feedbackType = signal<'success' | 'danger'>('success');
 
   ngOnInit(): void {
     this.loadPendingProducts();
   }
 
   loadPendingProducts(): void {
-    this.isLoading = true;
+    this.isLoading.set(true);
     this.productService.getPendingProducts().subscribe({
       next: (data) => {
-        this.pendingProducts = data;
-        this.isLoading = false;
+        this.pendingProducts.set(data);
+        this.isLoading.set(false);
       },
       error: (err) => {
         console.error('Error loading pending products:', err);
-        this.isLoading = false;
+        this.isLoading.set(false);
       }
     });
   }
@@ -38,13 +39,13 @@ export class ProductApprovalList implements OnInit {
   updateStatus(product: Product, newStatus: 'approved' | 'rejected'): void {
     this.productService.reviewProduct(product.id_product, { status: newStatus }).subscribe({
       next: () => {
-        this.feedbackType = newStatus === 'approved' ? 'success' : 'danger';
-        this.feedbackMessage = `Producto "${product.name}" ha sido ${newStatus === 'approved' ? 'aprobado' : 'rechazado'}.`;
-        this.pendingProducts = this.pendingProducts.filter(p => p.id_product !== product.id_product);
+        this.feedbackType.set(newStatus === 'approved' ? 'success' : 'danger');
+        this.feedbackMessage.set(`Producto "${product.name}" ha sido ${newStatus === 'approved' ? 'aprobado' : 'rechazado'}.`);
+        this.pendingProducts.update((list) => list.filter((p) => p.id_product !== product.id_product));
       },
       error: (err) => {
-        this.feedbackType = 'danger';
-        this.feedbackMessage = err.error?.message || 'Error al actualizar el estado del producto.';
+        this.feedbackType.set('danger');
+        this.feedbackMessage.set(err.error?.message || err.error?.error || 'Error al actualizar el estado del producto.');
       }
     });
   }

@@ -1,2 +1,17 @@
+<h1 class="visually-hidden">Hello, {{ title() }}</h1>
+
+<!-- Barra de navegación global -->
 <app-navbar></app-navbar>
-<router-outlet></router-outlet>
+
+<!-- Contenido de las rutas activas -->
+<main class="main-content">
+  <router-outlet />
+</main>
+
+<!-- Pie de página general -->
+<footer class="bg-light text-center py-4 border-top mt-5">
+  <div class="container text-muted small">
+    <p class="mb-1 fw-semibold text-dark">Bobba Go! &copy; 2026</p>
+    <p class="mb-0">Sistema de Gestión de Tienda de Boba, Catálogo y Programa de Lealtad.</p>
+  </div>
+</footer>

@@ -7,8 +7,8 @@
           Selecciona la bebida o pastel que el cliente eligió como regalo al completar sus 10 sellos.
         </p>
 
-        <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
-        <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+        <div *ngIf="successMessage()" class="alert alert-success">{{ successMessage() }}</div>
+        <div *ngIf="errorMessage()" class="alert alert-danger">{{ errorMessage() }}</div>
 
         <form (ngSubmit)="onClaim()">
           <div class="mb-3">
@@ -20,13 +20,13 @@
             <label class="form-label fw-semibold">Producto de Cortesía</label>
             <select class="form-select" [(ngModel)]="selectedProductId" name="selectedProductId" required>
               <option [ngValue]="null" disabled>Elige el producto gratis</option>
-              <option *ngFor="let opt of rewardOptions" [ngValue]="opt.id_product">
+              <option *ngFor="let opt of rewardOptions()" [ngValue]="opt.id_product">
                 {{ opt.name }} ({{ opt.category_name }})
               </option>
             </select>
           </div>
 
-          <button type="submit" class="btn btn-success w-100 py-2 fw-semibold" [disabled]="!customerId || !selectedProductId">
+          <button type="submit" class="btn btn-success w-100 py-2 fw-semibold" [disabled]="!customerId() || !selectedProductId()">
             <i class="bi bi-gift me-2"></i>Entregar Recompensa
           </button>
         </form>
