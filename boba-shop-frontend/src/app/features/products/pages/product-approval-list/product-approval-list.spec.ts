@@ -1,4 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ProductApprovalList } from './product-approval-list';
 
 describe('ProductApprovalList', () => {
@@ -8,6 +10,7 @@ describe('ProductApprovalList', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [ProductApprovalList],
+      providers: [provideHttpClient(), provideHttpClientTesting()]
     }).compileComponents();
 
     fixture = TestBed.createComponent(ProductApprovalList);

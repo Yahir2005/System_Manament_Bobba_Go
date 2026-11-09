@@ -5,12 +5,11 @@ import { MenuSection } from '../../models/menu.model';
 
 @Component({
   selector: 'app-menu-catalog',
-  standalone: true,
   imports: [CommonModule],
-  templateUrl: './menu-catalog.component.html',
-  styleUrls: ['./menu-catalog.component.scss']
+  templateUrl: './menu-catalog.html',
+  styleUrl: './menu-catalog.scss'
 })
-export class MenuCatalogComponent implements OnInit {
+export class MenuCatalog implements OnInit {
   private menuService = inject(MenuService);
 
   menuSections: MenuSection[] = [];
@@ -38,3 +37,5 @@ export class MenuCatalogComponent implements OnInit {
     });
   }
 }
+
+export { MenuCatalog as MenuCatalogComponent };
