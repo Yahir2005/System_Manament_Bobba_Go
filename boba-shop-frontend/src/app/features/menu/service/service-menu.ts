@@ -14,3 +14,5 @@ export class MenuService {
     return this.http.get<MenuSection[]>(`${this.apiUrl}/menu`);
   }
 }
+
+export { MenuService as ServiceMenu };

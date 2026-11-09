@@ -45,3 +45,5 @@ export class ProductService {
     return this.http.patch<Product>(`${this.apiUrl}/products/${id_product}/status`, review);
   }
 }
+
+export { ProductService as ServiceProducts };

@@ -1,12 +1,16 @@
 import { TestBed } from '@angular/core/testing';
-import { ServiceMenu } from './service-menu';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { MenuService, ServiceMenu } from './service-menu';
 
 describe('ServiceMenu', () => {
-  let service: ServiceMenu;
+  let service: MenuService;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
-    service = TestBed.inject(ServiceMenu);
+    TestBed.configureTestingModule({
+      providers: [provideHttpClient(), provideHttpClientTesting()]
+    });
+    service = TestBed.inject(MenuService);
   });
 
   it('should be created', () => {
