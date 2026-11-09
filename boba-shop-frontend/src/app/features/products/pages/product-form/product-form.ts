@@ -3,16 +3,15 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ProductService } from '../../service/service-products';
-import { Category } from '../../models/product.model';
+import { Category, CreateProductDto } from '../../models/product.model';
 
 @Component({
   selector: 'app-product-form',
-  standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
-  templateUrl: './product-form.component.html',
-  styleUrls: ['./product-form.component.scss']
+  templateUrl: './product-form.html',
+  styleUrl: './product-form.scss'
 })
-export class ProductFormComponent implements OnInit {
+export class ProductForm implements OnInit {
   private fb = inject(FormBuilder);
   private productService = inject(ProductService);
   private router = inject(Router);
@@ -53,9 +52,13 @@ export class ProductFormComponent implements OnInit {
     this.isSubmitting = true;
     this.errorMessage = '';
 
-    const payload = {
-      ...this.productForm.value,
-      price: this.productForm.value.precio
+    const formValue = this.productForm.value;
+    const payload: CreateProductDto = {
+      id_category: Number(formValue.id_category),
+      name: formValue.name,
+      description: formValue.description || undefined,
+      price: Number(formValue.precio),
+      image_url: formValue.image_url || undefined
     };
 
     this.productService.createProduct(payload).subscribe({
@@ -71,3 +74,5 @@ export class ProductFormComponent implements OnInit {
     });
   }
 }
+
+export { ProductForm as ProductFormComponent };

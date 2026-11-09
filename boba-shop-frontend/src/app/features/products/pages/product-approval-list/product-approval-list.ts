@@ -5,12 +5,11 @@ import { Product } from '../../models/product.model';
 
 @Component({
   selector: 'app-product-approval-list',
-  standalone: true,
   imports: [CommonModule],
-  templateUrl: './product-approval-list.component.html',
-  styleUrls: ['./product-approval-list.component.scss']
+  templateUrl: './product-approval-list.html',
+  styleUrl: './product-approval-list.scss'
 })
-export class ProductApprovalListComponent implements OnInit {
+export class ProductApprovalList implements OnInit {
   private productService = inject(ProductService);
 
   pendingProducts: Product[] = [];
@@ -50,3 +49,5 @@ export class ProductApprovalListComponent implements OnInit {
     });
   }
 }
+
+export { ProductApprovalList as ProductApprovalListComponent };
